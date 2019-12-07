@@ -127,19 +127,91 @@ export default class App extends React.Component {
     ]
   ]
 
+  constructor(props) {
+    super(props)
+    this.state = {
+      results: [],
+      current: "0",
+      dotInputed: false,
+      afterValueButton: false,
+    }
+  }
+
   valueButton = (value) => {
+    let currentString = this.state.current;
+    const dotInputed = this.state.dotInputed;
+    let newDotInputed = dotInputed;
+    if (value == ".") {
+      if (!dotInputed) {
+        currentString = currentString + value;
+        newDotInputed = true
+      }
+    } else if(currentString == "0") {
+      currentString = value;
+    } else {
+      currentString = currentString + value;
+    }
+    this.setState({current: currentString, dotInputed: newDotInputed, afterValueButton: true})
   }
 
   enterButton = () => {
+    let newValue = NaN;
+    if (this.state.dotInputed) {
+      newValue = parseFloat(this.state.current);
+    } else {
+      newValue = parseInt(this.state.current, 10);
+    }
+    if (isNaN(newValue)) {
+      return
+    }
+    let results = this.state.results;
+    results.push(newValue)
+    this.setState({current: "0", dotInputed: false, results: results, afterValueButton: false})
   }
 
   calcButton = (value) => {
+    if (this.state.results.length < 2) {
+      return
+    }
+    if (this.state.afterValueButton == true) {
+      return
+    }
+    let newResults = this.state.results;
+    const target2 = newResults.pop();
+    const target1 = newResults.pop();
+    let newValue = null;
+    switch (value) {
+      case '+':
+        newValue = target1 + target2
+        break
+      case '-':
+        newValue = target1 - target2
+        break
+      case '*':
+        newValue = target1 * target2
+        break
+      case '/':
+        newValue = target1 / target2
+        if (!isFinite(newValue)) {
+          newValue = null
+        }
+        break
+      default:
+        break
+    }
+    if (newValue == null) {
+      return
+    }
+    newResults.push(newValue);
+    this.setState({current: '0', dotInputed: false, results: newResults, afterValueButton: false})
   }
 
   acButton = () => {
+    this.setState({current: "0", dotInputed: false, results: newResults, afterValueButton: false})
   }
 
   cButton = () => {
+    this.setState({current: "0", dotInputed: false, afterValueButton: false})
   }
 
   render() {
@@ -149,8 +221,10 @@ export default class App extends React.Component {
           <View style={styles.resultLine}>
           </View>
           <View style={styles.resultLine}>
+            <Text>{this.state.current}</Text>
           </View>
           <View style={styles.resultLine}>
+            <Text>{this.state.results.join(' ')}</Text>
           </View>
         </View>
         <View style={styles.buttons}>
