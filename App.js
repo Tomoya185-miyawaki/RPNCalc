@@ -207,7 +207,7 @@ export default class App extends React.Component {
   }
 
   acButton = () => {
-    this.setState({current: "0", dotInputed: false, results: newResults, afterValueButton: false})
+    this.setState({current: "0", dotInputed: false, results: [], afterValueButton: false})
   }
 
   cButton = () => {
